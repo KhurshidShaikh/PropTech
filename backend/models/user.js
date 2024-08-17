@@ -17,11 +17,22 @@ const userSchema=mongoose.Schema({
         type:String,
         default:"default.png"
     },
-
     createdAt:{
         type:Date,
         default:Date.now
+    },
+    otp:{
+        type:String
+    },
+    otpExpires:{
+        type:Date
+
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
     }
+    
 })
 
 const userModel=mongoose.model("user",userSchema)
