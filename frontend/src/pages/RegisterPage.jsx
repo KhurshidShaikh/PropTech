@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios"
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const RegisterPage = () => {
@@ -23,7 +25,9 @@ setFormData({
 const handleSubmit= async(e)=>{
   e.preventDefault();
   if (!formdata.username || !formdata.email || !formdata.password) {
-    alert("All fields are required");
+    toast.error("All fields are required", {
+      autoClose: 3000, 
+    });
     return;
   }
 
@@ -121,7 +125,10 @@ const handleSubmit= async(e)=>{
           </Link>{" "}
         </p>
       </div>
+      <ToastContainer/>
     </div>
+
+
   );
 };
 

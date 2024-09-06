@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const OtpVerify = () => {
@@ -34,7 +35,13 @@ const OtpVerify = () => {
   const handleSubmit = async(e) => {
     e.preventDefault();
     const otp = otpValue.join("");
-    console.log("OTP submitted:", otpValue);
+      if(otp.length<4){
+        toast.error("Please Enter yout OTP", {
+          autoClose: 3000, 
+        });
+        return
+      }
+    console.log("OTP submitted:", otp);
 
     try {
    const response= await axios.post(`http://localhost:3100/api/auth/verifyotp/${id}`,{otp})
@@ -101,7 +108,7 @@ const OtpVerify = () => {
       </div>
 
 
-
+<ToastContainer/>
 
     </div>
   );
