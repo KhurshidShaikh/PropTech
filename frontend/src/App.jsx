@@ -11,7 +11,7 @@ const App = () => {
       <Router>
       <Routes>
     
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />}/>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/verifyotp/:id" element={<OtpVerify />} />
        
