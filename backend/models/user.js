@@ -11,15 +11,14 @@ const userSchema=mongoose.Schema({
         type:String
     },
     posts:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"post"
+        }
 
     ],
     avatar:{
         type:String,
-        default:"default.png"
-    },
-    createdAt:{
-        type:Date,
-        default:Date.now
     },
     otp:{
         type:String
@@ -31,9 +30,21 @@ const userSchema=mongoose.Schema({
     isVerified:{
         type:Boolean,
         default:false
+    },
+    savedPost:[
+       { 
+       type:mongoose.Schema.Types.ObjectId,
+        ref:"savedPost"
     }
+
+    ],
+    chats:[
+        { type:mongoose.Schema.Types.ObjectId,
+            ref:"chat"
+          }
+    ]
     
-})
+},{timestamps:true});
 
 const userModel=mongoose.model("user",userSchema)
 

@@ -82,12 +82,12 @@ router.post("/verifyotp/:id",async(req,res)=>{
       return res.json({message:"verification successfull",verified:true})
 
     }else{
-      return res.json({message:"Otp has expired"})
+      return res.json({message:"Otp has expired",verified:false})
     }
   
   }
   else{
-    return res.json({message:"Invalid Otp"})
+    return res.json({message:"Invalid Otp",verified:false})
   }
 
 
@@ -115,7 +115,7 @@ router.post("/login",async(req,res)=>{
 
    let user= await userModel.findOne({email})
   if (!user){
-    return res.json({message:"Invalid Credentials"})
+    return res.json({message:"Invalid Credentials",verified:false})
   }
 
   bcrypt.compare(password,user.password,(err,result)=>{
@@ -126,10 +126,10 @@ router.post("/login",async(req,res)=>{
           secure: process.env.NODE_ENV === 'production',
          });
 
-        return res.json({message:"login sucessfull"})
+        return res.json({message:"login successful",verified:true})
     }
     else{
-        return res.json({message:"Invalid Credentials"})
+        return res.json({message:"Invalid Credentials",verified:false})
     }
   })
     
