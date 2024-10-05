@@ -7,7 +7,7 @@ const jwt=require("jsonwebtoken")
 const passwordHash=require("../utils/passHash")
 const otpgenerator=require("otp-generator")
 const emailSend = require("../utils/emailSend");
-
+const isLoggedIn=require("../middleware/isLoggedIn")
 
 router.post("/register", async(req,res)=>{
   const {username,email,password}=req.body;
@@ -124,9 +124,12 @@ router.post("/login",async(req,res)=>{
          res.cookie("authToken",token,{
           httpOnly:true,
           secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+           path: '/',
+           domain: 'localhost'
          });
-
-        return res.json({message:"login successful",verified:true})
+      
+        return res.json({message:"login successful",verified:true,user:user})
     }
     else{
         return res.json({message:"Invalid Credentials",verified:false})
@@ -135,6 +138,30 @@ router.post("/login",async(req,res)=>{
     
 
 })
+
+router.get("/isloggedin",async(req,res)=>{
+  const token = req.cookies.authToken;
+
+  if (!token) {
+    return res.json({ login: false ,message:"user not logged in"});
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user=await userModel.findOne({email:decoded.email})
+    res.json({ login: true, user});
+
+  } catch (error) {
+    console.log(error.message);
+    res.json({ login: false });
+  }
+});
+
+  
+
+
+
+
 
 
 

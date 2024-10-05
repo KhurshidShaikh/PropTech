@@ -48,24 +48,24 @@ router.post("/createpost",isLoggedIn,async(req,res)=>{
 
 router.get("/getposts",async(req,res)=>{
     try {
-        const { category, city, minprice, maxprice } = req.query;
-
+        const { category, city, minPrice, maxPrice } = req.query;
+     
     let query = {};
 
     if (category) query['basicInfo.category'] = category;
     if (city) query['basicInfo.city'] = city;
     
   
-    if (minprice || maxprice) {
+    if (minPrice || maxPrice) {
       query['basicInfo.price'] = {};
-      if (minprice) query['basicInfo.price'].$gte = Number(minprice); 
-      if (maxprice) query['basicInfo.price'].$lte = Number(maxprice); 
+      if (minPrice) query['basicInfo.price'].$gte = Number(minPrice); 
+      if (maxPrice) query['basicInfo.price'].$lte = Number(maxPrice); 
     }
 
         const posts= await postModel.find(query).select('basicInfo')
 
         if (!posts || posts.length === 0) {
-            return res.status(404).json({ message: "No posts found matching the criteria." });
+            return res.status(200).json({ posts });
           }
       
         return res.status(200).json({posts})

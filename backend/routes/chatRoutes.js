@@ -9,7 +9,7 @@ const userModel = require("../models/user");
 router.get("/getchats",isLoggedIn,async(req,res)=>{
     try {
     const userId=req.user.id
-    const user=await userModel.findById(userId).populate("chats","users messages")
+    const user=await userModel.findById(userId).populate("chats","users messages lastMessage seenBy")
     if(!user){
         return res.status(404).json({message:"user not found"})
     }
@@ -47,7 +47,7 @@ router.get("/getchat/:id",isLoggedIn,async(req,res)=>{
     const chat= await chatModel.findOne({
      _id:chatId,
      users:userId
-    }).populate("users","username avatar").populate("messages","text")
+    }).populate("users","username avatar").populate("messages","text sender createdAt")
 
     if(!chat){
         return res.status(404).json({message:"chat not found"})
@@ -55,7 +55,7 @@ router.get("/getchat/:id",isLoggedIn,async(req,res)=>{
     chat.seenBy.push(userId)
     await chat.save()
     
-    return res.status(500).json({chat})
+    return res.status(200).json({chat})
 
     } catch (error) {
         console.log(error);
@@ -87,7 +87,7 @@ router.post("/addchat",isLoggedIn,async(req,res)=>{
 
         user.chats.push(newChat._id)
         await user.save()
-
+        console.log(newChat._id);
         return res.status(200).json({newChat})
 
         

@@ -4,11 +4,9 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-
 const RegisterPage = () => {
   const navigate=useNavigate()
-
+  const [loading,setLoading]=useState(false)
   const [formdata,setFormData]=useState({
     username:"",
     email:"",
@@ -34,6 +32,7 @@ const handleSubmit= async(e)=>{
   console.log(formdata);
   
   try {
+    setLoading(true)
     const response = await axios.post("http://localhost:3100/api/auth/register", formdata, { withCredentials: true });
     console.log(response.data);
     
@@ -44,7 +43,7 @@ const handleSubmit= async(e)=>{
       console.log(response.data.message);
       
     }
-
+    setLoading(false)
 
 
   } catch (error) {
@@ -55,6 +54,7 @@ const handleSubmit= async(e)=>{
     } else {
       console.log("Error setting up request", error.message);
     }
+    setLoading(false)
   }
   
 
@@ -66,7 +66,7 @@ const handleSubmit= async(e)=>{
     <div className=" max-h-screen flex flex-col sm:flex-row justify-center items-center w-full p-6 overflow-hidden">
       {/* Image */}
       <div className=" w-1/2">
-        <h1 className="font-bold text-4xl text-blue-500 mt-6">PropTech</h1>
+     
         <img
           src="https://img.freepik.com/premium-vector/growth-real-estate-market-businessman-analyzing-housing-business-real-estate-business-concept-flat-vector-illustration_923732-4868.jpg?w=740"
           alt=""
@@ -74,7 +74,7 @@ const handleSubmit= async(e)=>{
         />
       </div>
       {/* Forms */}
-      <div className="w-full sm:w-1/2 flex justify-center items-center flex-col space-y-4 mt-4">
+      <div className="w-full sm:w-1/2 flex justify-center items-center flex-col space-y-4 ">
         <h2 className="font-semibold text-lg sm:text-xl">Register</h2>
         <form className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-md" onSubmit={handleSubmit}>
         <label htmlFor="name" className="text-sm sm:text-base">User Name</label>
@@ -115,7 +115,7 @@ const handleSubmit= async(e)=>{
             className="py-2 bg-blue-900 font-bold text-white rounded-lg"
            
           >
-            Register
+             {loading?"Loading...":"Register"}
           </button>
         </form>
         <p>
