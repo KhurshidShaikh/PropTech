@@ -1,9 +1,38 @@
 import { useState } from 'react'
 import { Search, Building2, Award, Home } from 'lucide-react'
 import Footer from '../components/Footer'
+import { useNavigate } from 'react-router-dom'
+import {io} from "socket.io-client"
+
+
 
 export default function HomePage() {
+   const socket=io("http://localhost:3100")
+
+
   const [searchType, setSearchType] = useState('buy')
+  const [city, setCity] = useState('')
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const navigate = useNavigate()
+
+  const handleSearch=()=>{
+   const queryParams= new URLSearchParams({
+    category:searchType,
+    city,
+    minPrice,
+    maxPrice
+   }).toString()
+
+    navigate(`/list?${queryParams}`)   
+  }
+
+   const handleSocket=()=>{
+      socket.emit("client","hii jhatu server mai client bol rha hu")
+   }
+
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 flex flex-col">
@@ -11,8 +40,10 @@ export default function HomePage() {
       <main className="container mx-auto px-4 py-4 flex-grow flex flex-col lg:flex-row items-center overflow-y-auto">
         <div className="lg:w-1/2 lg:pr-8 xl:pr-16 mt-5">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4 sm:mb-6">
-            Find Real Estate & Get Your Dream Place
+            Find Real Estate & Get Your Dream Place   
+           
           </h1>
+          <button className='bg-white py-2 px-2' onClick={handleSocket}>Click me</button>
           <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
             Discover your perfect home with PropTech. We offer a wide range of properties to suit every need and budget. Start your journey to homeownership today!
           </p>
@@ -33,16 +64,33 @@ export default function HomePage() {
             </div>
             <div className="flex flex-wrap -mx-2">
               <div className="w-full sm:w-1/3 px-2 mb-4">
-                <input type="text" placeholder="City" className="w-full p-2 border rounded-md text-sm" />
+                <input type="text"
+                 placeholder="City" 
+                 className="w-full p-2 border rounded-md text-sm" 
+                 onChange={(e) => setCity(e.target.value.toLowerCase())}/>
               </div>
               <div className="w-full sm:w-1/3 px-2 mb-4">
-                <input type="text" placeholder="Min Price" className="w-full p-2 border rounded-md text-sm" />
+              <input
+                  type="text"
+                  placeholder="Min Price"
+                  className="w-full p-2 border rounded-md text-sm"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
               </div>
               <div className="w-full sm:w-1/3 px-2 mb-4">
-                <input type="text" placeholder="Max Price" className="w-full p-2 border rounded-md text-sm" />
+              <input
+                  type="text"
+                  placeholder="Max Price"
+                  className="w-full p-2 border rounded-md text-sm"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
               </div>
             </div>
-            <button className="w-full bg-sky-500  text-white p-2 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center text-sm sm:text-base">
+            <button 
+            className="w-full bg-sky-500  text-white p-2 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center text-sm sm:text-base"
+             onClick={handleSearch}>
               <Search className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Search Properties
             </button>
@@ -68,7 +116,7 @@ export default function HomePage() {
               src="https://media.istockphoto.com/id/1409298953/photo/real-estate-agents-shake-hands-after-the-signing-of-the-contract-agreement-is-complete.jpg?s=612x612&w=0&k=20&c=SFybbpGMB0wIoI0tJotFqptzAYK_mICVITNdQIXqnyc="
               alt="Modern apartment building showcasing PropTech's real estate offerings"
               layout="fill"
-              objectFit="cover"
+             
               className="rounded-lg"
             />
             <div className="absolute top-4 right-4 bg-sky-500 text-white p-2 rounded-full">

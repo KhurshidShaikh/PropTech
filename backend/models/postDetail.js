@@ -21,13 +21,16 @@ amenities:{
    default:[]
 },
 balcony:{
-    type:Number
+    type:String
 },
 waterSupply:{
     type:String
 },
 pets:{
     type:String,
+},
+maintenance:{
+   type:Number
 },
 username:{
    type:String

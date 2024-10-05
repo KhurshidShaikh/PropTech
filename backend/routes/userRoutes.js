@@ -5,6 +5,7 @@ const isLoggedIn=require("../middleware/isLoggedIn")
 const userModel=require("../models/user");
 const passwordHash = require("../utils/passHash");
 const postModel = require("../models/post");
+const savedPostModel=require("../models/savedPost")
 
 router.get("/getallusers",async(req,res)=>{
     try {
@@ -58,13 +59,14 @@ try {
   if(username){
     user.username=username
   }
+  if(avatar){
+    user.avatar=avatar
+  }
   if(password){
  const hashPassword= await passwordHash(password)
  user.password=hashPassword
   }
-  if(avatar){
-    user.avatar=avatar
-  }
+ 
 
 await user.save()
 
@@ -109,13 +111,13 @@ try {
   
   const savedPosts= await savedPostModel.find({userId}).populate("postId")
 
-  const response = {
+  const userPosts = {
     posts: posts.length > 0 ? posts : [],      
     savedPosts: savedPosts.length > 0 ? savedPosts : [] 
   };
 
 
-  return res.status(200).json({ response });
+  return res.status(200).json({ userPosts });
   
 } catch (error) {
   console.error(error);

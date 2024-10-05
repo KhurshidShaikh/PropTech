@@ -2,13 +2,19 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import axios from "../api/axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+
 
 
 const LoginPage = () => {
   const navigate=useNavigate()
+  const dispatch=useDispatch()
+ 
+  const [loading,setLoading]=useState(false)
 
   const [formdata,setFormData]=useState({
     email:"",
@@ -35,21 +41,36 @@ const handleSubmit=async(e)=>{
 
   console.log(formdata);
   try {
+    setLoading(true)
    const response=await axios.post("http://localhost:3100/api/auth/login",formdata)
+   console.log('Full login response:', response);
+   console.log('Login response cookies:', document.cookie);
    console.log(response.data);
+
    if(response.data.verified){
-    alert(response.data.message)
-    navigate("/home")
+    
+      dispatch(setUser(response.data.user)),
+      navigate("/")
+     
    }
    else{
-    alert(response.data.message)
+    toast.error("Invalid Credentials", {
+      autoClose: 3000, 
+    });
    }
-
+   setLoading(false)
     
   } catch (error) {
-    
+    console.log(error);
+    toast.error(
+      "Internal server error. Please try again later", {
+      autoClose: 3000,
+    });
+
+
   }
   
+
 
 }
 
@@ -60,7 +81,7 @@ const handleSubmit=async(e)=>{
     <div className=" max-h-screen flex flex-col sm:flex-row justify-center items-center w-full p-6 overflow-hidden">
       {/* Image */}
       <div className=" w-1/2">
-        <h1 className="font-bold text-4xl text-blue-500 mt-6">PropTech</h1>
+       
         <img
           src="https://img.freepik.com/premium-vector/growth-real-estate-market-businessman-analyzing-housing-business-real-estate-business-concept-flat-vector-illustration_923732-4868.jpg?w=740"
           alt=""
@@ -68,10 +89,10 @@ const handleSubmit=async(e)=>{
         />
       </div>
   
-      <div className="w-full sm:w-1/2 flex justify-center items-center flex-col space-y-4 mt-4">
+      <div className="w-full sm:w-1/2 flex justify-center items-center flex-col space-y-4">
         <h2 className="font-semibold text-lg sm:text-xl">Login</h2>
         <form className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-md" onSubmit={handleSubmit}>
-        <label htmlFor="name" className="text-sm sm:text-base">Full Name</label>
+        <label htmlFor="name" className="text-sm sm:text-base">Email</label>
           <input
             type="email"
             name="email"
@@ -97,9 +118,10 @@ const handleSubmit=async(e)=>{
             type="submit"
             className="py-2 bg-blue-900 font-bold text-white rounded-md"
           >
-            Login
+            {loading?"Loading...":"Login"}
           </button>
         </form>
+
         <p>
           Don't have an account?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">

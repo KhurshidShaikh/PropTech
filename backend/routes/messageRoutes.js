@@ -34,7 +34,7 @@ router.post("/:id",isLoggedIn,async(req,res)=>{
            chat.messages.push(message._id)
 
             await chat.save()
-           return res.status(500).json({message})
+           return res.status(200).json({message})
 
         
        } catch (error) {
