@@ -12,13 +12,14 @@ const userRoute=require("./routes/userRoutes")
 const postRoute=require("./routes/postRoutes")
 const chatRoute=require("./routes/chatRoutes")
 const messageRoute=require("./routes/messageRoutes")
+const chatModel =require("./models/chat")
 
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-      origin: 'http://localhost:5173', // Allow your frontend origin
+      origin: 'http://localhost:5173',
       methods: ["GET", "POST"],
-      credentials: true // Allow credentials if needed
+      credentials: true 
   }
 });
 
@@ -50,20 +51,78 @@ app.get("/",(req,res)=>{
 })
 
 
-io.on("connection",(socket)=>{
 
-  socket.on("client",(arg)=>{
-    console.log(arg);
-  })
+// real-time chatting
+   
+const onlineUsers = new Map();
 
-})
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Handle user joining
+  socket.on('addUser', (userId) => {
+    console.log('User joined:', userId);
+    onlineUsers.set(userId, socket.id);
+    console.log("online users:",onlineUsers);
+    io.emit('getOnlineUsers', Array.from(onlineUsers.keys()));
+  });
 
 
+  socket.on('sendMessage', async (data) => {
+    console.log('Message received:', data);
+    const { senderId, receiverId, text, chatId } = data;
+    
+    try {
+    
+      const receiverSocketId = onlineUsers.get(receiverId);
+      console.log('Receiver socket ID:', receiverSocketId);
 
+      
+      if (receiverSocketId) {
+        // Send to receiver
+        io.to(receiverSocketId).emit('getMessage', {
+          senderId,
+          text,
+          chatId,
+          createdAt: new Date(),
+        });
+        
+        // Send confirmation to sender
+        socket.emit('messageSent', {
+          success: true,
+          message: 'Message delivered'
+        });
+      }
+    } catch (error) {
+      console.error('Error handling message:', error);
+      socket.emit('messageError', {
+        success: false,
+        error: error.message
+      });
+    }
+  });
 
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    let disconnectedUserId = null;
+    onlineUsers.forEach((socketId, userId) => {
+      if (socketId === socket.id) {
+        disconnectedUserId = userId;
+      }
+    });
+    
+    if (disconnectedUserId) {
+      onlineUsers.delete(disconnectedUserId);
+      io.emit('getOnlineUsers', Array.from(onlineUsers.keys()));
+    }
+  });
+});
 
-
-
+// Error handling
+io.on('error', (error) => {
+  console.error('Socket.IO error:', error);
+});
 
 
 

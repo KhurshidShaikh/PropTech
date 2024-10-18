@@ -48,12 +48,12 @@ router.post("/createpost",isLoggedIn,async(req,res)=>{
 
 router.get("/getposts",async(req,res)=>{
     try {
-        const { category, city, minPrice, maxPrice } = req.query;
+        const { category, city, minPrice, maxPrice ,address} = req.query;
      
     let query = {};
 
     if (category) query['basicInfo.category'] = category;
-    if (city) query['basicInfo.city'] = city;
+    if (city) query['basicInfo.city'] = { $regex: new RegExp(city, 'i') };
     
   
     if (minPrice || maxPrice) {
@@ -61,6 +61,30 @@ router.get("/getposts",async(req,res)=>{
       if (minPrice) query['basicInfo.price'].$gte = Number(minPrice); 
       if (maxPrice) query['basicInfo.price'].$lte = Number(maxPrice); 
     }
+
+    if (address && address.trim() !== '') {
+        console.log('Address search term:', address);
+        const addressTerms = address.trim().split(/\s+/).filter(term => term.length > 0);
+        
+       
+        const addressRegex = addressTerms.map(term => {
+          
+          if (/^\d+$/.test(term)) {
+            return `(^|\\s)${term}(\\s|$)`;
+          }
+          return term;
+        }).join('.*');
+        
+        console.log('Address regex:', addressRegex);
+        
+        query['basicInfo.address'] = {
+          $regex: new RegExp(addressRegex, 'i')
+        };
+      }
+    
+      console.log('Query:', JSON.stringify(query, null, 2)); 
+
+
 
         const posts= await postModel.find(query).select('basicInfo')
 

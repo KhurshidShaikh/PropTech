@@ -16,10 +16,10 @@ export default function ProfilePage() {
   const[loading,setLoading]=useState()
   const[error,setError]=useState(false)
   const [posts,setPosts]=useState([])
+  const [savedPosts,setSavedPosts]=useState([])
   const [chats,setChats]=useState([])
  
   const currentUser=useSelector((state)=>state.user.currentUser)
-     
   const getPosts=async()=>{
     try {
     
@@ -28,6 +28,9 @@ export default function ProfilePage() {
      if(response){
        setLoading(false)
       setPosts(response.data.userPosts.posts)
+      setSavedPosts(response.data.userPosts.savedPosts)
+      console.log("saved post le",savedPosts);
+      
      }
     
  
@@ -45,6 +48,7 @@ export default function ProfilePage() {
           console.log("chats aaye hain:",response.data.chats);
           setChats(response.data.chats)
         }
+        
       } catch (error) {
         console.log("error getting chats",error);
       }
@@ -55,7 +59,7 @@ export default function ProfilePage() {
       getPosts()
       getChats()
     },[])
-  
+    
   return (
     currentUser?(
       <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100">
@@ -95,10 +99,25 @@ export default function ProfilePage() {
              
             
             </div>
+{/* 
+            <div className=" mt-7 bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 rounded-lg shadow-md p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Saved Posts</h2>
+              
+              </div>
+             
+            { loading?"Loading...":<PropertyList posts={savedPosts}/>}
+             
+            
+            </div> */}
+
           </div>
 
           <div className="md:w-1/3">
-            <Chats chats={chats} />
+          {chats.length>0? <Chats chats={chats} />:<h3>No Messages</h3>}
+         
+
+
           </div>
         </div>
       </main>

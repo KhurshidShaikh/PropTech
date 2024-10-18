@@ -1,9 +1,15 @@
 import React from 'react'
 import { Search, MapPin, Bed, Bath, Bookmark, MessageCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import NoProperties from '../components/NoProperties'
+
+
+
 
 const PropertyList = ({posts}) => {
  const navigate=useNavigate();
+
+ 
       
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -16,7 +22,7 @@ const PropertyList = ({posts}) => {
           <h2 className="text-xl font-semibold mb-2">{property?.basicInfo?.title}</h2>
           <p className="text-gray-600 mb-2 flex items-center">
             <MapPin size={16} className="mr-1" />
-            {property.basicInfo.city}
+            {property?.basicInfo?.city}
           </p>
           <p className="text-2xl font-bold text-sky-500 mb-4">Rs {property?.basicInfo?.price}</p>
           <div className="flex items-center justify-between mb-4">
@@ -32,7 +38,7 @@ const PropertyList = ({posts}) => {
          
         </div>
       </div>
-    ))):(<h2>No Properties !</h2>)}
+    ))):(<NoProperties/>)}
   </div>
   )
 }

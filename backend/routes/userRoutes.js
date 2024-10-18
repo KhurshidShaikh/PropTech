@@ -117,7 +117,7 @@ try {
   };
 
 
-  return res.status(200).json({ userPosts });
+  return res.status(200).json({ userPosts});
   
 } catch (error) {
   console.error(error);

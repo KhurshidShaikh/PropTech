@@ -8,6 +8,9 @@ import noavatar from "../assets/noavatar.jpg"
 import Map from '../components/Map';
 import axios from '../api/axios';
 import { useSelector } from 'react-redux';
+import PropertyReviews from '../components/PropertyReviews';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 export default function PropertyDetailPage() {
         
@@ -16,6 +19,7 @@ const [photoIndex, setPhotoIndex] = useState(0);
 const [citycoordinates,seCityCoordinates]=useState([])
 const navigate=useNavigate()
 const currentUser=useSelector((state)=>state.user.currentUser)
+const [saved, setSaved] = useState();
 
 const property=useLoaderData();
 console.log("property details:",property);
@@ -49,36 +53,7 @@ const getCoordinates = async () => {
 
 }
 
-const getDetails=async()=>{
-  try {
-   
-    const overpassQuery = `
-[out:json];
-(
-  node["amenity"="school"](around:1000, 19.165001, 73.022481);
-  node["amenity"="park"](around:1000, 19.165001, 73.022481);
-  node["amenity"="bus_stop"](around:1000, 19.165001, 73.022481);
-  node["railway"="station"](around:1000, 19.165001, 73.022481);
-);
-out body;
-`;
-    const overpassUrl = `http://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`;
-   
-      const response= await axios.get("http://localhost:3100/api/overpass",{
-        params: {
-          query: overpassQuery 
-        }
-    }
-    )
-   
 
-        console.log("Neighborhood Insights:",response.data);
-  } catch (error) {
-    console.log("errorrrrrrrrrrrrrr");
-  }
-  
-
-}
  
 
 
@@ -87,7 +62,6 @@ out body;
 
 useEffect(()=>{
   getCoordinates()
-  getDetails()
 },[property._id])
 
 
@@ -98,7 +72,7 @@ const handleSendMessage = async () => {
       navigate("/login")
       return
     }
-    const receiverId = property.userId; // Get the receiverId from property
+    const receiverId = property.userId; 
     if (!receiverId) {
       console.error('Receiver ID is not available');
       return; 
@@ -107,11 +81,11 @@ const handleSendMessage = async () => {
     const response = await axios.post('/chat/addchat', {
       receiverId: receiverId 
     });
-    console.log('Response from chat initiation:', response.data); // Log the response for debugging
+ 
     if (response.status === 200) {
-      const chatId = response?.data?.newChat?._id||response?.data?.chat?._id; // Get the new chat ID
+      const chatId = response?.data?.newChat?._id||response?.data?.chat?._id; 
       if (chatId) {
-        navigate(`/chat/${chatId}`); // Redirect to the chat page
+        navigate(`/chat/${chatId}`); 
       } else {
         console.error('Chat ID is not available');
       }
@@ -120,6 +94,43 @@ const handleSendMessage = async () => {
     console.error('Error initiating chat:', error);
   }
 };
+
+const handleDeletePost=()=>{
+  confirmAlert({
+    title: 'Confirm to Delete',
+    message: 'Are you sure to delete post ?',
+    buttons: [
+      {
+        label: 'Yes',
+        onClick: async() =>{
+          const res= await axios.delete(`/post/deletepost/${property._id}`)
+          if(res.data){
+            alert(res.data.message)
+            navigate(`/profile/${property.userId}`)
+          }
+          return
+        }
+      },
+      {
+        label: 'No',
+        onClick: () => {return}
+      }
+    ]
+  });
+
+}
+
+const handleSavePost=async()=>{
+  const res= await axios.post(`/post/save/${property._id}`)
+   
+  if(res.data.saved) {
+    setSaved(true)
+  }
+  else{
+    setSaved(false)
+  }
+
+}
 
 
 
@@ -175,7 +186,7 @@ const handleSendMessage = async () => {
               <p className="text-gray-700 mb-6 ">{property.postDetail.description}</p>
              
             </div>
-            <h2>niche dekh</h2>
+           <PropertyReviews currentUser={currentUser}/>
           </div>
      
 
@@ -183,7 +194,7 @@ const handleSendMessage = async () => {
           <div className="bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 rounded-lg shadow-md p-6 mb-8">
           <div className="flex items-center bg-white p-2 rounded-xl">
           <Building size={30} className='mr-2'/>
-            <h2 className=" font-semibold text-2xl">{(property.basicInfo.propertyType).charAt(0).toUpperCase()+(property.basicInfo.propertyType).slice(1)}</h2>
+            <h2 className=" font-semibold text-2xl">{(property.basicInfo.category).charAt(0).toUpperCase()+(property.basicInfo.category).slice(1)}</h2>
                 </div>
           
                 <h2 className="text-2xl font-semibold mb-4">General</h2>
@@ -254,36 +265,43 @@ const handleSendMessage = async () => {
                   <span>{property.basicInfo.bathroom} bathroom</span>
                 </div>
               </div>
-              <h2 className="text-xl font-semibold mb-4">Nearby Places</h2>
-              {/* <ul className="space-y-2">
-                {property.nearbyPlaces.map((place, index) => (
-                  <li key={index} className="flex items-center">
-                    <place.icon size={20} className="mr-2" />
-                    <span>{place.name}</span>
-                    <span className="ml-auto text-sm text-gray-600">{place.distance}</span>
-                  </li>
-                ))}
-              </ul> */}
+             
+            
             </div>
 
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-              <div className="relative h-64">
+              <div className=" relative h-64 z-0">
                 <Map city={citycoordinates} property={property}/>
               </div>
+              
             </div>
-          
+           { currentUser && currentUser._id===property.userId &&
+          ( <button
+            type="submit"
+            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            onClick={handleDeletePost}
+          >
+            Delete Post
+          </button>)}
+            {currentUser && currentUser._id !== property.userId && ( 
             <div className="flex space-x-4">
-              <button
-               className="flex-1 bg-blue-400 text-gray-900 py-2 px-4 rounded hover:bg-blue-500 flex items-center justify-center"
-               onClick={handleSendMessage}>
-                <MessageCircle size={20} className="mr-2" />
-                Send a Message
-              </button>
-              <button className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-100 flex items-center justify-center">
+           
+          <button
+          className="flex-1 bg-blue-400 text-gray-900 py-2 px-4 rounded hover:bg-blue-500 flex items-center justify-center"
+         onClick={handleSendMessage}>
+         <MessageCircle size={20} className="mr-2" />
+          Send a Message
+          </button>
+ 
+              <button 
+              className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-100 flex items-center justify-center"
+              onClick={handleSavePost}
+              >
                 <Bookmark size={20} className="mr-2" />
-                Save the Place
+                {saved?"UnSave":"Save Place"}
               </button>
             </div>
+          )}
           </div>
         </div>
       </main>
