@@ -99,7 +99,7 @@ export default function ProfilePage() {
              
             
             </div>
-
+{/* 
             <div className=" mt-7 bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 rounded-lg shadow-md p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold">Saved Posts</h2>
@@ -109,7 +109,7 @@ export default function ProfilePage() {
             { loading?"Loading...":<PropertyList posts={savedPosts}/>}
              
             
-            </div>
+            </div> */}
 
           </div>
 
