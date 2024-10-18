@@ -23,7 +23,7 @@ const Map = ({posts,city,property}) => {
   }
   return (
    
-    <MapContainer center={mapCenter}  zoom={8} scrollWheelZoom={true} className=' h-full w-full'>
+    <MapContainer center={mapCenter}  zoom={8} scrollWheelZoom={true} className='h-full w-full'>
     <TileLayer
       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

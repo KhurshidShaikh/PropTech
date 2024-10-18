@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { Search, Building2, Award, Home } from 'lucide-react'
 import Footer from '../components/Footer'
 import { useNavigate } from 'react-router-dom'
-import {io} from "socket.io-client"
-
+import Loader from '../components/Loader'
+import About from '../components/About'
+import Contact from '../components/Contact'
 
 
 export default function HomePage() {
-   const socket=io("http://localhost:3100")
 
 
   const [searchType, setSearchType] = useState('buy')
@@ -27,12 +27,7 @@ export default function HomePage() {
     navigate(`/list?${queryParams}`)   
   }
 
-   const handleSocket=()=>{
-      socket.emit("client","hii jhatu server mai client bol rha hu")
-   }
-
-
-
+ 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 flex flex-col">
@@ -43,7 +38,6 @@ export default function HomePage() {
             Find Real Estate & Get Your Dream Place   
            
           </h1>
-          <button className='bg-white py-2 px-2' onClick={handleSocket}>Click me</button>
           <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">
             Discover your perfect home with PropTech. We offer a wide range of properties to suit every need and budget. Start your journey to homeownership today!
           </p>
@@ -125,6 +119,7 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+      <About/>
       <Footer/>
     </div>
   )

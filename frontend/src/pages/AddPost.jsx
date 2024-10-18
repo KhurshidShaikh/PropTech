@@ -30,8 +30,8 @@ export default function AddPost() {
     const basicInfo={
       title:data.title,
       price: data.price,
-      address: data.address,
-      city: data.city,
+      address: data.address.toLowerCase(),
+      city: data.city.toLowerCase(),
       bedroom: data.bedrooms,
       bathroom: data.bathrooms,
       category: data.category,

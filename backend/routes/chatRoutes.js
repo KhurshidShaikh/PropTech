@@ -6,6 +6,8 @@ const chatModel=require("../models/chat");
 const userModel = require("../models/user");
 
 
+
+
 router.get("/getchats",isLoggedIn,async(req,res)=>{
     try {
     const userId=req.user.id
@@ -25,7 +27,7 @@ router.get("/getchats",isLoggedIn,async(req,res)=>{
         };
       }));
      
-     
+      console.log("Chats returned:", chats);
 
     return res.status(200).json({chats})
     
@@ -36,7 +38,7 @@ router.get("/getchats",isLoggedIn,async(req,res)=>{
     }
 
 })
-
+   
 
 router.get("/getchat/:id",isLoggedIn,async(req,res)=>{
     try {
@@ -80,12 +82,17 @@ router.post("/addchat",isLoggedIn,async(req,res)=>{
           if (existingChat) {
             return res.status(200).json({ message: "Chat already exists", chat: existingChat });
           }
-          
+           
         const newChat=await chatModel.create({
             users:[userId,req.body.receiverId]
         })
 
         user.chats.push(newChat._id)
+        const receiver=await userModel.findById(req.body.receiverId)
+        if(receiver){
+            receiver.chats.push(newChat._id)
+            await receiver.save()
+        }
         await user.save()
         console.log(newChat._id);
         return res.status(200).json({newChat})
@@ -102,7 +109,7 @@ router.put("/readchat/:id",isLoggedIn,async(req,res)=>{
     try {
         const userId=req.user.id
         const chatId=req.params.id
-       const updatechat= await chatModel.findByIdAndUpdate(chatId,{seenBy},{new:true})
+       const updatechat= await chatModel.findByIdAndUpdate(chatId,{seenBy:userId},{new:true})
        if(!updatechat){
         return res.status(404).json({message:"chat not updated"})
     }

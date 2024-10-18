@@ -9,8 +9,7 @@ const Chats = ({chats}) => {
  
 const currentUser=useSelector((state)=>state.user.currentUser)
 const navigate=useNavigate()
-
-
+  
   return (
 
 
@@ -19,7 +18,7 @@ const navigate=useNavigate()
               <div className="space-y-4">
                 {chats.map((message) => (
                   <div key={message.id} 
-                  className={`flex items-center rounded-lg p-3 ${message.seenBy.includes(currentUser._id)? "bg-white":"bg-yellow-50"}`}
+                  className={`flex items-center rounded-lg p-3 ${message.seenBy.includes(currentUser._id)? "bg-white":" bg-yellow-50"}`}
                   onClick={()=>navigate(`/chat/${message._id}`)}
                   >
                     <img src={message.receiver.avatar?message.receiver.avatar:noavatar} alt={message.receiver.username}  className="rounded-full mr-3 w-16 h-16" />
